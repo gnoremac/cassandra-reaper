@@ -6,6 +6,7 @@ List of patches:
 * [#141](https://github.com/spotify/cassandra-reaper/pull/141) - Compatibility with cassandra 2.1.13
 * [cassandra-reaper-ui v0.2](cassandra-reaper-ui) - integrated web UI
 * [#143](https://github.com/spotify/cassandra-reaper/pull/143) - Add ability to automatically setup schedule repairs for each cluster
+* [prevent incremental subrange repair to allow proper support for inc repairs](https://github.com/Nuance-Mobility/cassandra-reaper/commit/42f5f0d28cf2add127d034237c8bdc7115a0f38b)
 
 Cassandra Reaper is a centralized, stateful, and highly configurable tool for running Cassandra
 repairs for multi-site clusters.
