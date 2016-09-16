@@ -5,6 +5,7 @@ N.B.: This is patched version of cassandra-reaper, now working with Cassandra 2.
 List of patches:
 * [#141](https://github.com/spotify/cassandra-reaper/pull/141) - Compatibility with cassandra 2.1.13
 * [cassandra-reaper-ui v0.2](cassandra-reaper-ui) - integrated web UI
+* [#143](https://github.com/spotify/cassandra-reaper/pull/143) - Add ability to automatically setup schedule repairs for each cluster
 
 Cassandra Reaper is a centralized, stateful, and highly configurable tool for running Cassandra
 repairs for multi-site clusters.
@@ -148,6 +149,13 @@ The Reaper service specific configuration values are:
   Optional setting which you can set to be "true", if you wish to enable the CORS headers
   for running an external GUI application, like [this project](https://github.com/spodkowinski/cassandra-reaper-ui).
 
+* autoScheduling:
+
+  Optional setting to automatically setup repair schedules for all non-system keyspaces in a cluster.
+  If enabled, adding a new cluster will automatically setup a schedule repair 
+  for each keyspace. Cluster keyspaces are monitored based on a configurable frequency,
+  so that adding or removing a keyspace will result in adding / removing the corresponding scheduled repairs.
+   
 Notice that in the *server* section of the configuration, if you want to bind the service
 to all interfaces, use value "0.0.0.0", or just leave the *bindHost* line away completely.
 Using "*" as bind value won't work.

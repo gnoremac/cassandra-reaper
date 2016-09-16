@@ -225,10 +225,7 @@ public class ReaperApplicationConfiguration extends Configuration {
     private Duration periodBetweenPolls;
 
     @JsonProperty
-    private Duration timeBeforeFirstSchedule;
-
-    @JsonProperty
-    private Duration scheduleSpreadPeriod;
+    private Duration schedulingNextActivationPeriod;
 
     public Boolean isEnabled() {
       return enabled;
@@ -254,35 +251,22 @@ public class ReaperApplicationConfiguration extends Configuration {
       this.periodBetweenPolls = periodBetweenPolls;
     }
 
-    public Duration getTimeBeforeFirstSchedule() {
-      return timeBeforeFirstSchedule;
+    public Duration getSchedulingNextActivationPeriod() {
+      return schedulingNextActivationPeriod;
     }
 
-    public void setTimeBeforeFirstSchedule(Duration timeBeforeFirstSchedule) {
-      this.timeBeforeFirstSchedule = timeBeforeFirstSchedule;
-    }
-
-    public Duration getScheduleSpreadPeriod() {
-      return scheduleSpreadPeriod;
-    }
-
-    public void setScheduleSpreadPeriod(Duration scheduleSpreadPeriod) {
-      this.scheduleSpreadPeriod = scheduleSpreadPeriod;
-    }
-
-    public boolean hasScheduleSpreadPeriod() {
-      return scheduleSpreadPeriod != null;
+    public void setSchedulingNextActivationPeriod(Duration schedulingNextActivationPeriod) {
+      this.schedulingNextActivationPeriod = schedulingNextActivationPeriod;
     }
 
     @Override
     public String toString() {
       return "AutoSchedulingConfiguration{" +
-          "enabled=" + enabled +
-          ", initialDelayPeriod=" + initialDelayPeriod +
-          ", periodBetweenPolls=" + periodBetweenPolls +
-          ", timeBeforeFirstSchedule=" + timeBeforeFirstSchedule +
-          ", scheduleSpreadPeriod=" + scheduleSpreadPeriod +
-          '}';
+              "enabled=" + enabled +
+              ", initialDelayPeriod=" + initialDelayPeriod +
+              ", periodBetweenPolls=" + periodBetweenPolls +
+              ", schedulingNextActivationPeriod=" + schedulingNextActivationPeriod +
+              '}';
     }
   }
 
