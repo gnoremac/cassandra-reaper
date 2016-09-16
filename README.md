@@ -1,6 +1,10 @@
 cassandra-reaper
 ================
 
+N.B.: This is patched version of cassandra-reaper, now working with Cassandra 2.1.15
+List of patches:
+[#141](https://github.com/spotify/cassandra-reaper/pull/141) - Compatibility with cassandra 2.1.13
+
 Cassandra Reaper is a centralized, stateful, and highly configurable tool for running Cassandra
 repairs for multi-site clusters.
 
@@ -93,6 +97,13 @@ The Reaper service specific configuration values are:
   divided by the intensity value. 0.5 means half of the time is spent sleeping, and half running.
   Intensity 0.75 means that 25% of the total time is used sleeping and 75% running.
   This value can also be overwritten per repair run when invoking repairs.
+
+* incrementalRepair:
+
+  Incremental reaper is a boolean value (true | false) which defines if you want to exercise the incremental
+  repair logic. Note that this is only supported with the PARALLEL repairParallelism setting.
+  For more details in incremental repair, please refer to the following article
+  http://www.datastax.com/dev/blog/more-efficient-repairs
 
 * repairRunThreadCount:
 
@@ -209,6 +220,7 @@ Source code for all the REST resources can be found from package com.spotify.rea
     * *segmentCount*: Defines the amount of segments to create for repair run. (Optional)
     * *repairParallelism*: Defines the used repair parallelism for repair run. (Optional)
     * *intensity*: Defines the repair intensity for repair run. (Optional)
+    * *incrementalRepair*: Defines if incremental repair should be done. [True/False] (Optional)
 
 * PUT    /repair_run/{id}
   * Expected query parameters:
@@ -248,6 +260,7 @@ Source code for all the REST resources can be found from package com.spotify.rea
     * *segmentCount*: Defines the amount of segments to create for scheduled repair runs. (Optional)
     * *repairParallelism*: Defines the used repair parallelism for scheduled repair runs. (Optional)
     * *intensity*: Defines the repair intensity for scheduled repair runs. (Optional)
+    * *incrementalRepair*: Defines if incremental repair should be done. [True/False] (Optional)
     * *scheduleDaysBetween*: Defines the amount of days to wait between scheduling new repairs.
                              For example, use value 7 for weekly schedule, and 0 for continuous.
     * *scheduleTriggerTime*: Defines the time for first scheduled trigger for the run.
