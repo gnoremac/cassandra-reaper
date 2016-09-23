@@ -1,5 +1,5 @@
-cassandra-reaper
-================
+eCG's cassandra-reaper
+======================
 
 N.B.: This is patched version of cassandra-reaper, now working with Cassandra 2.1.15 w/ incremental repairs.
 
@@ -7,7 +7,14 @@ List of patches:
 * [#141](https://github.com/spotify/cassandra-reaper/pull/141) - Compatibility with cassandra 2.1.13
 * [cassandra-reaper-ui v0.2](cassandra-reaper-ui) - integrated web UI
 * [#143](https://github.com/spotify/cassandra-reaper/pull/143) - Add ability to automatically setup schedule repairs for each cluster
-* [prevent incremental subrange repair to allow proper support for inc repairs](https://github.com/Nuance-Mobility/cassandra-reaper/commit/42f5f0d28cf2add127d034237c8bdc7115a0f38b)
+* [@adejanovski's "prevent incremental subrange repair to allow proper support for inc repairs"](https://github.com/adejanovski/cassandra-reaper/commit/42f5f0d28cf2add127d034237c8bdc7115a0f38b)
+* [@adejanovski's "fix for getPendingTasks() etc. "](https://github.com/adejanovski/cassandra-reaper/commit/970f934341c2151a8b01707157d8f0f9d1e82817) 
+
+Original README is below.
+
+cassandra-reaper
+========================
+
 
 Cassandra Reaper is a centralized, stateful, and highly configurable tool for running Cassandra
 repairs for multi-site clusters.
