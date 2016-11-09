@@ -17,6 +17,8 @@ hangingRepairTimeoutMins: 30
 # You can also use value 0 for scheduleDaysBetween, for continuous repairs.
 scheduleDaysBetween: 7
 
+incrementalRepair: false
+
 # storageType is either "database" or "memory"
 storageType: memory
 
@@ -97,3 +99,22 @@ database:
 
   # the minimum amount of time an connection must sit idle in the pool before it is eligible for eviction
   minIdleTime: 1 minute
+
+# Config used to automatically add/remove sheduled repair for each keyspace
+autoScheduling:
+
+  # Whether scheduled repairs will be automatically generated for each keyspace in a cluster
+  enabled: false
+
+  # initial delay before checking for keyspace changes (e.g. added/remove keyspaces) - unit is a Duration
+  initialDelayPeriod: PT15S
+
+  # period between checks for keyspace changes - unit is a Duration
+  periodBetweenPolls: PT10M
+
+  # how soon the first scheduled repair will start - unit is a Duration
+  timeBeforeFirstSchedule: PT5M
+
+  # how far apart are keyspace schedules from each other - unit is a Duration
+  scheduleSpreadPeriod: PT6H
+

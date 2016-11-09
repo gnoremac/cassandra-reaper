@@ -25,11 +25,11 @@ import com.spotify.reaper.cassandra.JmxProxy;
 import com.spotify.reaper.cassandra.RepairStatusHandler;
 import com.spotify.reaper.core.RepairSegment;
 import com.spotify.reaper.core.RepairUnit;
+import com.spotify.reaper.utils.SimpleCondition;
 import com.sun.management.UnixOperatingSystemMXBean;
 
 import org.apache.cassandra.repair.RepairParallelism;
 import org.apache.cassandra.service.ActiveRepairService;
-import org.apache.cassandra.utils.SimpleCondition;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.commons.lang3.concurrent.LazyInitializer;
 import org.joda.time.DateTime;
@@ -99,11 +99,11 @@ public final class SegmentRunner implements RepairStatusHandler, Runnable {
     }
   }
 
-  public static void postpone(AppContext context, RepairSegment segment) {
+  public static void postpone(AppContext context, RepairSegment segment, Optional<RepairUnit> repairUnit) {
     LOG.info("Postponing segment {}", segment.getId());
     context.storage.updateRepairSegment(segment.with()
         .state(RepairSegment.State.NOT_STARTED)
-        .coordinatorHost(null)
+        .coordinatorHost(repairUnit.isPresent() && repairUnit.get().getIncrementalRepair()? segment.getCoordinatorHost():null) // set coordinator host to null only for full repairs
         .repairCommandId(null)
         .startTime(null)
         .failCount(segment.getFailCount() + 1)
@@ -112,7 +112,7 @@ public final class SegmentRunner implements RepairStatusHandler, Runnable {
   }
 
   public static void abort(AppContext context, RepairSegment segment, JmxProxy jmxConnection) {
-    postpone(context, segment);
+    postpone(context, segment, Optional.fromNullable((RepairUnit) null));
     LOG.info("Aborting repair on segment with id {} on coordinator {}",
         segment.getId(), segment.getCoordinatorHost());
     jmxConnection.cancelAllRepairs();
@@ -124,7 +124,7 @@ public final class SegmentRunner implements RepairStatusHandler, Runnable {
   public void postponeCurrentSegment() {
     synchronized (condition) {
       RepairSegment segment = context.storage.getRepairSegment(segmentId).get();
-      postpone(context, segment);
+      postpone(context, segment, context.storage.getRepairUnit(segment.getRepairUnitId()));
     }
   }
 
@@ -155,6 +155,7 @@ public final class SegmentRunner implements RepairStatusHandler, Runnable {
 
       RepairUnit repairUnit = context.storage.getRepairUnit(segment.getRepairUnitId()).get();
       String keyspace = repairUnit.getKeyspaceName();
+      boolean fullRepair = !repairUnit.getIncrementalRepair();
 
       // If this segment is blocked by other repairs on the hosts involved, we will want to double-
       // check with storage, whether those hosts really should be busy with repairs. This listing of
@@ -180,7 +181,7 @@ public final class SegmentRunner implements RepairStatusHandler, Runnable {
       LOG.debug("Enter synchronized section with segment ID {}", segmentId);
       synchronized (condition) {
         commandId = coordinator.triggerRepair(segment.getStartToken(), segment.getEndToken(),
-            keyspace, validationParallelism, repairUnit.getColumnFamilies());
+            keyspace, validationParallelism, repairUnit.getColumnFamilies(), fullRepair);
 
         if (commandId == 0) {
           // From cassandra source in "forceRepairAsync":
@@ -240,6 +241,16 @@ public final class SegmentRunner implements RepairStatusHandler, Runnable {
   boolean canRepair(RepairSegment segment, String keyspace, JmxProxy coordinator,
       LazyInitializer<Set<String>> busyHosts) {
     Collection<String> allHosts;
+    if(repairUnit.getIncrementalRepair()){
+    	// In incremental repairs, only one segment is allowed at once (one segment == the full primary range of one node)
+    	if(repairHasSegmentRunning(segment.getRunId())) {
+    		LOG.info("SegmentRunner declined to repair segment {} because only one segment is allowed "
+                    + "at once for incremental repairs", segmentId);
+           String msg = String.format("Postponed due to already running segment");
+           repairRunner.updateLastEvent(msg);
+           return false;
+    	}
+    }
     try {
       // when hosts are coming up or going down, this method can throw an
       //  UndeclaredThrowableException
@@ -303,7 +314,21 @@ public final class SegmentRunner implements RepairStatusHandler, Runnable {
     return true;
   }
 
-  private void abort(RepairSegment segment, JmxProxy jmxConnection) {
+  private boolean repairHasSegmentRunning(long repairRunId) {
+	  Collection<RepairSegment> segments = context.storage.getRepairSegmentsForRun(repairRunId);
+	  System.out.println(segments);
+	  for(RepairSegment segment:segments) {
+		  if(segment.getState() == RepairSegment.State.RUNNING) {
+			  LOG.info("segment '{}' is running on host '{}' and with a fail count of {}",
+				        segment.getId(), segment.getCoordinatorHost(), segment.getFailCount());
+			  return true;
+		  }
+	  }
+	
+	  return false;
+}
+
+private void abort(RepairSegment segment, JmxProxy jmxConnection) {
     abort(context, segment, jmxConnection);
   }
 

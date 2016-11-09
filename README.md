@@ -1,5 +1,20 @@
+eCG's cassandra-reaper
+======================
+
+N.B.: This is patched version of cassandra-reaper, now working with Cassandra 2.1.15 w/ incremental repairs.
+
+List of patches:
+* [#141](https://github.com/spotify/cassandra-reaper/pull/141) - Compatibility with cassandra 2.1.13
+* [cassandra-reaper-ui v0.2](cassandra-reaper-ui) - integrated web UI
+* [#143](https://github.com/spotify/cassandra-reaper/pull/143) - Add ability to automatically setup schedule repairs for each cluster
+* [@adejanovski's "prevent incremental subrange repair to allow proper support for inc repairs"](https://github.com/adejanovski/cassandra-reaper/commit/42f5f0d28cf2add127d034237c8bdc7115a0f38b)
+* [@adejanovski's "fix for getPendingTasks() etc. "](https://github.com/adejanovski/cassandra-reaper/commit/970f934341c2151a8b01707157d8f0f9d1e82817) 
+
+Original README is below.
+
 cassandra-reaper
-================
+========================
+
 
 Cassandra Reaper is a centralized, stateful, and highly configurable tool for running Cassandra
 repairs for multi-site clusters.
@@ -94,6 +109,13 @@ The Reaper service specific configuration values are:
   Intensity 0.75 means that 25% of the total time is used sleeping and 75% running.
   This value can also be overwritten per repair run when invoking repairs.
 
+* incrementalRepair:
+
+  Incremental reaper is a boolean value (true | false) which defines if you want to exercise the incremental
+  repair logic. Note that this is only supported with the PARALLEL repairParallelism setting.
+  For more details in incremental repair, please refer to the following article
+  http://www.datastax.com/dev/blog/more-efficient-repairs
+
 * repairRunThreadCount:
 
   The amount of threads to use for handling the Reaper tasks. Have this big enough not to cause
@@ -136,6 +158,13 @@ The Reaper service specific configuration values are:
   Optional setting which you can set to be "true", if you wish to enable the CORS headers
   for running an external GUI application, like [this project](https://github.com/spodkowinski/cassandra-reaper-ui).
 
+* autoScheduling:
+
+  Optional setting to automatically setup repair schedules for all non-system keyspaces in a cluster.
+  If enabled, adding a new cluster will automatically setup a schedule repair 
+  for each keyspace. Cluster keyspaces are monitored based on a configurable frequency,
+  so that adding or removing a keyspace will result in adding / removing the corresponding scheduled repairs.
+   
 Notice that in the *server* section of the configuration, if you want to bind the service
 to all interfaces, use value "0.0.0.0", or just leave the *bindHost* line away completely.
 Using "*" as bind value won't work.
@@ -209,6 +238,7 @@ Source code for all the REST resources can be found from package com.spotify.rea
     * *segmentCount*: Defines the amount of segments to create for repair run. (Optional)
     * *repairParallelism*: Defines the used repair parallelism for repair run. (Optional)
     * *intensity*: Defines the repair intensity for repair run. (Optional)
+    * *incrementalRepair*: Defines if incremental repair should be done. [True/False] (Optional)
 
 * PUT    /repair_run/{id}
   * Expected query parameters:
@@ -248,6 +278,7 @@ Source code for all the REST resources can be found from package com.spotify.rea
     * *segmentCount*: Defines the amount of segments to create for scheduled repair runs. (Optional)
     * *repairParallelism*: Defines the used repair parallelism for scheduled repair runs. (Optional)
     * *intensity*: Defines the repair intensity for scheduled repair runs. (Optional)
+    * *incrementalRepair*: Defines if incremental repair should be done. [True/False] (Optional)
     * *scheduleDaysBetween*: Defines the amount of days to wait between scheduling new repairs.
                              For example, use value 7 for weekly schedule, and 0 for continuous.
     * *scheduleTriggerTime*: Defines the time for first scheduled trigger for the run.

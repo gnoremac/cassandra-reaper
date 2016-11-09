@@ -13,6 +13,7 @@
  */
 package com.spotify.reaper;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.spotify.reaper.ReaperApplicationConfiguration.JmxCredentials;
@@ -22,6 +23,7 @@ import com.spotify.reaper.resources.PingResource;
 import com.spotify.reaper.resources.ReaperHealthCheck;
 import com.spotify.reaper.resources.RepairRunResource;
 import com.spotify.reaper.resources.RepairScheduleResource;
+import com.spotify.reaper.service.AutoSchedulingManager;
 import com.spotify.reaper.service.RepairManager;
 import com.spotify.reaper.service.SchedulingManager;
 import com.spotify.reaper.storage.IStorage;
@@ -87,6 +89,7 @@ public class ReaperApplication extends Application<ReaperApplicationConfiguratio
   @Override
   public void initialize(Bootstrap<ReaperApplicationConfiguration> bootstrap) {
     bootstrap.addBundle(new AssetsBundle("/assets/", "/webui", "index.html"));
+    bootstrap.getObjectMapper().registerModule(new JavaTimeModule());
   }
 
   @Override
@@ -164,6 +167,11 @@ public class ReaperApplication extends Application<ReaperApplicationConfiguratio
 
     SchedulingManager.start(context);
 
+    if (config.hasAutoSchedulingEnabled()) {
+      LOG.debug("using specified configuration for auto scheduling: {}", config.getAutoScheduling());
+      AutoSchedulingManager.start(context);
+    }
+
     LOG.info("resuming pending repair runs");
     context.repairManager.resumeRunningRepairRuns(context);
   }
@@ -185,6 +193,7 @@ public class ReaperApplication extends Application<ReaperApplicationConfiguratio
 
   private void checkConfiguration(ReaperApplicationConfiguration config) {
     LOG.debug("repairIntensity: " + config.getRepairIntensity());
+    LOG.debug("incrementalRepair:" + config.getIncrementalRepair());
     LOG.debug("repairRunThreadCount: " + config.getRepairRunThreadCount());
     LOG.debug("segmentCount: " + config.getSegmentCount());
     LOG.debug("repairParallelism: " + config.getRepairParallelism());

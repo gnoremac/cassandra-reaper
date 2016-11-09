@@ -7,6 +7,7 @@ scheduleDaysBetween: 7
 repairRunThreadCount: 15
 hangingRepairTimeoutMins: 1
 storageType: memory
+incrementalRepair: false
 
 logging:
   level: DEBUG
@@ -65,3 +66,11 @@ database:
 
   # the minimum amount of time an connection must sit idle in the pool before it is eligible for eviction
   minIdleTime: 1 minute
+
+# Config used to automatically add/remove sheduled repair for all keyspaces
+autoScheduling:
+  enabled: false
+  initialDelayPeriod: PT1M
+  periodBetweenPolls: PT10M
+  timeBeforeFirstSchedule: PT5M
+  scheduleSpreadPeriod: PT6H
