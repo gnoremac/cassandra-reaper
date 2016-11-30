@@ -68,6 +68,11 @@ public class ReaperApplicationConfiguration extends Configuration {
   private String storageType;
 
   private String enableCrossOrigin;
+  
+  @JsonProperty
+  @NotNull
+  @DefaultValue("7199")
+  private Integer defaultJmxPort;
 
   @Valid
   @NotNull
@@ -166,6 +171,15 @@ public class ReaperApplicationConfiguration extends Configuration {
   @JsonProperty
   public void setHangingRepairTimeoutMins(int hangingRepairTimeoutMins) {
     this.hangingRepairTimeoutMins = hangingRepairTimeoutMins;
+  }
+  
+  
+  public Integer getDefaultJmxPort() {
+    return defaultJmxPort;
+  }
+
+  public void setDefaultJmxPort(Integer defaultJmxPort) {
+    this.defaultJmxPort = defaultJmxPort;
   }
 
   public Map<String, Integer> getJmxPorts() {

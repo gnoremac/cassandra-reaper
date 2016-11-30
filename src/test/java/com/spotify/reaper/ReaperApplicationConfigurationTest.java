@@ -37,6 +37,7 @@ public class ReaperApplicationConfigurationTest {
     config.setScheduleDaysBetween(7);
     config.setStorageType("foo");
     config.setIncrementalRepair(false);
+    config.setDefaultJmxPort(7199);
   }
 
   @Test

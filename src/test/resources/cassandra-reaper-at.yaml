@@ -9,6 +9,10 @@ hangingRepairTimeoutMins: 1
 storageType: memory
 incrementalRepair: false
 
+# The default jmx port used by the reaper
+# jmxPorts mapping will override this if specified
+defaultJmxPort: 7199
+
 logging:
   level: DEBUG
   loggers:

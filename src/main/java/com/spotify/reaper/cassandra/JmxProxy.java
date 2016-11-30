@@ -61,7 +61,6 @@ public class JmxProxy implements NotificationListener, AutoCloseable {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmxProxy.class);
 
-  private static final int JMX_PORT = 7199;
   private static final String JMX_URL = "service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi";
   private static final String SS_OBJECT_NAME = "org.apache.cassandra.db:type=StorageService";
   private static final String AES_OBJECT_NAME =
@@ -102,11 +101,8 @@ public class JmxProxy implements NotificationListener, AutoCloseable {
       throws ReaperException {
     assert null != host : "null host given to JmxProxy.connect()";
     String[] parts = host.split(":");
-    if (parts.length == 2) {
-      return connect(handler, parts[0], Integer.valueOf(parts[1]), username, password);
-    } else {
-      return connect(handler, host, JMX_PORT, username, password);
-    }
+    assert parts.length == 2 : "Invalid host:port given to JmxProxy.connect()";
+    return connect(handler, parts[0], Integer.valueOf(parts[1]), username, password);
   }
 
 
@@ -122,8 +118,7 @@ public class JmxProxy implements NotificationListener, AutoCloseable {
    * @param password password to use for JMX authentication
    */
   static JmxProxy connect(Optional<RepairStatusHandler> handler, String host, int port,
-      String username, String password)
-      throws ReaperException {
+      String username, String password) throws ReaperException {
     ObjectName ssMbeanName;
     ObjectName cmMbeanName;
     JMXServiceURL jmxUrl;
