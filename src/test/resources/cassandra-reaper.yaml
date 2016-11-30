@@ -26,6 +26,10 @@ storageType: memory
 # GUI lives at https://github.com/spodkowinski/cassandra-reaper-ui
 enableCrossOrigin: true
 
+# The default jmx port used by the reaper
+# jmxPorts mapping will override this if specified
+defaultJmxPort: 7199
+
 # custom jmx port mappings that will be used instead of the default port for specified hosts (optional)
 #jmxPorts:
 #  127.0.0.1: 7100

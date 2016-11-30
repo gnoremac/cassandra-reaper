@@ -26,12 +26,15 @@ public class JmxConnectionFactory {
 
   private Map<String, Integer> jmxPorts;
   private JmxCredentials jmxAuth;
+  private int defaultJmxPort;
 
   public JmxProxy connect(Optional<RepairStatusHandler> handler, String host)
       throws ReaperException {
     // use configured jmx port for host if provided
     if (jmxPorts != null && jmxPorts.containsKey(host) && !host.contains(":")) {
       host = host + ":" + jmxPorts.get(host);
+    } else if (!host.contains(":")) {
+      host = host + ":" + defaultJmxPort;
     }
     String username = null;
     String password = null;
@@ -69,5 +72,10 @@ public class JmxConnectionFactory {
 
   public void setJmxAuth(JmxCredentials jmxAuth) {
     this.jmxAuth = jmxAuth;
+  }
+  
+  public void setDefaultJmxPort(int defaultJmxPort) {
+    this.defaultJmxPort = defaultJmxPort;
+      
   }
 }

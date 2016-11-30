@@ -144,7 +144,10 @@ public class ReaperApplication extends Application<ReaperApplicationConfiguratio
       LOG.debug("using specified JMX credentials for authentication");
       context.jmxConnectionFactory.setJmxAuth(jmxAuth);
     }
-
+    
+    int defaultJmxPort = config.getDefaultJmxPort();
+    context.jmxConnectionFactory.setDefaultJmxPort(defaultJmxPort);
+    
     LOG.info("creating and registering health checks");
     // Notice that health checks are registered under the admin application on /healthcheck
     final ReaperHealthCheck healthCheck = new ReaperHealthCheck(context);
@@ -198,6 +201,7 @@ public class ReaperApplication extends Application<ReaperApplicationConfiguratio
     LOG.debug("segmentCount: " + config.getSegmentCount());
     LOG.debug("repairParallelism: " + config.getRepairParallelism());
     LOG.debug("hangingRepairTimeoutMins: " + config.getHangingRepairTimeoutMins());
+    LOG.debug("defaultJmxPort:" + config.getDefaultJmxPort());
     LOG.debug("jmxPorts: " + config.getJmxPorts());
   }
 
